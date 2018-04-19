@@ -11,6 +11,11 @@ GENDER_CHOICE = [
 
 
 class User(models.Model):
+	'''
+	用户信息表.
+	token: 记录用户登录时的token，防止多人使用同一账号.
+	'''
+
 	account = models.CharField(verbose_name='账号', max_length=11)
 	password = models.CharField(verbose_name='密码', max_length=18)
 	nickName = models.CharField(verbose_name='昵称', max_length=8)
@@ -28,6 +33,13 @@ class User(models.Model):
 
 
 class Post(models.Model):
+	'''
+	帖子详情表.
+	1. 创建帖子的时间不可更改,帖子被编辑后自动记录编辑的时间.
+	2. 当发帖人的账号被删除后,user字段为空.帖子不会因为发帖人账号被删除而被删除.
+	3. 当发帖人删除已发表的帖子后,帖子不会从数据库中删除,而是将show字段设为False,并不会在客户端显示.
+	'''
+
 	title = models.CharField(verbose_name='标题', max_length=30)
 	text = models.TextField(verbose_name='正文内容', null=True, blank=True)
 	createDate = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
@@ -47,6 +59,14 @@ class Post(models.Model):
 
 
 class Comment(models.Model):
+	'''
+	评论表.
+	1. 发表评论的时间不可更改.
+	2. 用户在发表评论后被删除账号,该评论不会被删除,且user字段设为空.
+	3. 评论的操作可分为1)给帖子评论;2)给评论回复.当执行1)操作时,评论表应该与帖子详情表建立外键关系;
+	当执行2)操作时,评论表应该与评论表建立外键关系.
+	'''
+
 	text = models.TextField(verbose_name='评论内容')
 	publishDate = models.DateTimeField(verbose_name='评论日期', auto_now_add=True)
 	likeNum = models.IntegerField(verbose_name='点赞数', default=0)
@@ -65,6 +85,12 @@ class Comment(models.Model):
 
 
 class Like(models.Model):
+	'''
+	点赞表.
+	可以给帖子或者评论点赞.当给帖子点赞时，应与帖子详情表建立外键关系;
+	给评论点赞时应与评论表建立外键关系.
+	'''
+
 	time = models.DateTimeField(verbose_name='点赞时间', auto_now_add=True)
 	user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
 	contentType = models.ForeignKey(ContentType, on_delete=models.CASCADE)
@@ -81,6 +107,11 @@ class Like(models.Model):
 
 
 class Read(models.Model):
+	'''
+	阅读表.
+	记录一个帖子被多少位用户阅读过.
+	'''
+
 	user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
 	post = models.ForeignKey(Post, on_delete=models.CASCADE)
 	readDate = models.DateTimeField(auto_now_add=True)
