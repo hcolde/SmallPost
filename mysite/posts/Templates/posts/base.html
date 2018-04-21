@@ -1,0 +1,99 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="{% static 'posts/css/base.css' %}">
+	{% block css %}{% endblock %}
+	<title>{% block title %}小贴吧{% endblock %}</title>
+</head>
+<body>
+<nav class="navbar navbar-default" role="navigation">
+	<div class="container-fluid">
+		<div class="navbar-header">
+		<a class="navbar-brand" href="{% url 'posts:index' %}">小贴吧</a>
+		</div>
+		<ul class="nav navbar-nav navbar-right">
+			<li><a data-toggle="modal" data-target="#myModal" id="Register"><span class="glyphicon glyphicon-user"></span> 注册</a></li>
+			<li><a data-toggle="modal" data-target="#myModal" id="Login"><span class="glyphicon glyphicon-log-in"></span> 登录</a></li>
+		</ul>
+	</div>
+</nav>
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="myModalLabel"></h4>
+			</div>
+			<div class="modal-body" id="myModalBody">
+				<form method="POST" class="form-horizontal" role="form">
+				{% csrf_token %}
+				<input type="text" name="belong" hidden>
+				<div class="form-group">
+					<label class="col-sm-2 control-label"><span class="marked">*</span>用户名</label>
+					<div class="col-sm-10">
+						<input class="form-control" type="text" name="account">
+					</div>
+				</div>
+				<p id="accountAlert" align="center" class="alert alert-danger" hidden>用户名必须是以字母开头，由字母或数字组成的5-11个字符</p>
+				<div class="form-group">
+					<label class="col-sm-2 control-label"><span class="marked">*</span>密码</label>
+					<div class="col-sm-10">
+						<input class="form-control" type="password" name="password1">
+					</div>
+				</div>
+				<p id="passwordAlert" align="center" class="alert alert-danger" hidden>密码必须是由字母以及数字组成的8-18个字符</p>
+				<div class="form-group" id="againGroup">
+					<label class="col-sm-2 control-label"><span class="marked">*</span>重复输入</label>
+					<div class="col-sm-10">
+						<input class="form-control" type="password" name="password2" placeholder="再次输入密码">
+					</div>
+				</div>
+				<p id="againAlert" align="center" class="alert alert-danger" hidden>两次输入的密码不一致</p>
+				<div class="form-group" id="nickNameGroup">
+					<label class="col-sm-2 control-label"><span class="marked">*</span>昵称</label>
+					<div class="col-sm-10">
+						<input class="form-control" type="text" name="nickName" placeholder="怎么称呼">
+					</div>
+				</div>
+				<p id="nickNameAlert" align="center" class="alert alert-danger" hidden>请输入昵称</p>
+				<div class="form-group" id="sexGroup">
+					<label class="col-sm-2 control-label"><span class="marked">*</span>性别</label>
+					<div class="col-sm-10">
+						<label class="radio-inline">
+							<input type="radio" name="sex" value="M">男
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="sex" value="F">女
+						</label>
+					</div>
+				</div>
+				<p id="sexAlert" align="center" class="alert alert-danger" hidden>请选择您的性别</p>
+				<div class="form-group" id="headPortraitGroup">
+					<label class="col-sm-2 control-label">头像</label>
+					<div class="col-sm-10">
+						<input type="file" name="headPortrait">
+					</div>
+				</div>
+				<button type="submit" id="FormSubmit" hidden></button>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+				</button>
+				<button type="button" class="btn btn-primary" id="submit">
+					提交
+				</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal -->
+</div>
+{% block body %}{% endblock %}
+<script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="{% static 'posts/js/base.js' %}"></script>
+</body>
+</html>

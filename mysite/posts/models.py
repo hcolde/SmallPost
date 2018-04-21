@@ -13,14 +13,14 @@ GENDER_CHOICE = [
 class User(models.Model):
 	'''
 	用户信息表.
-	token: 记录用户登录时的token，防止多人使用同一账号.
+	token: 记录用户登录时的token,防止多人使用同一账号.
 	'''
 
 	account = models.CharField(verbose_name='账号', max_length=11)
 	password = models.CharField(verbose_name='密码', max_length=18)
 	nickName = models.CharField(verbose_name='昵称', max_length=8)
-	token = models.CharField(max_length=32)
-	headPortrait = models.ImageField(verbose_name='头像', upload_to='uploads/')
+	token = models.CharField(max_length=32, blank=True)
+	headPortrait = models.ImageField(verbose_name='头像', upload_to='uploads/', blank=True)
 	sex = models.CharField(verbose_name='性别', max_length=2, choices=GENDER_CHOICE)
 
 
