@@ -1,18 +1,59 @@
+//自动运行
 window.onload = function(){ 
-	var nickName = getCookie('nickName');
-	if (nickName){
+	var msg = getCookie("msg");
+	if (msg=="100"){
+		var nickName = getCookie("nickName");
 		$("#Register").hide();
 		$("#Login").hide();
-		$("ul[class^='nav']").html("<li><a>"+nickName+",欢迎您</a></li>");
+		$("#Welcome").html("<a>"+nickName+"，欢迎您</a>");
+		$("#Welcome").show();
+		$("#Logout").show();
+	}else if(msg!=""){
+		switch(msg){
+			case "001"||"010":
+				alert("用户名或密码有误");
+				break;
+			case "011":
+				alert("该用户名已被注册");
+				break;
+			case "101":
+				alert("该昵称已被使用");
+				break;
+			case "110":
+				alert("注册成功");
+				break;
+		}
+		deleteCookie('msg');
 	}
 };
+
+//获取cookie
 function getCookie(name){
 	var arr,reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)");
 	if(arr=document.cookie.match(reg))
 		return unescape(arr[2]);
 	else
 		return null;
-}
+};
+
+//删除cookie
+function deleteCookie(name){
+	document.cookie=name+"=";
+};
+
+//退出登录
+$("#Logout").click(function(){
+	deleteCookie('msg');
+	deleteCookie('nickName');
+	deleteCookie('sex');
+	deleteCookie('headPortrait');
+	deleteCookie('token');
+	$("#Welcome").hide();
+	$("#Logout").hide();
+	$("#Register").show();
+	$("#Login").show();
+});
+
 //注册按钮
 $("#Register").click(function(){
 	//设置模态框标题

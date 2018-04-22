@@ -17,6 +17,7 @@
 		<ul class="nav navbar-nav navbar-right">
 			<li><a data-toggle="modal" data-target="#myModal" id="Register"><span class="glyphicon glyphicon-user"></span> 注册</a></li>
 			<li><a data-toggle="modal" data-target="#myModal" id="Login"><span class="glyphicon glyphicon-log-in"></span> 登录</a></li>
+			<li id='Welcome' style="display: none;"></li><li id='Logout' style="display: none;"><a>退出</a></li>
 		</ul>
 	</div>
 </nav>
@@ -29,7 +30,7 @@
 				<h4 class="modal-title" id="myModalLabel"></h4>
 			</div>
 			<div class="modal-body" id="myModalBody">
-				<form method="POST" class="form-horizontal" role="form">
+				<form method="POST" class="form-horizontal" role="form" enctype="multipart/form-data">
 				{% csrf_token %}
 				<input type="text" name="belong" hidden>
 				<div class="form-group">
@@ -94,6 +95,9 @@
 {% block body %}{% endblock %}
 <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
 <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+
+</script>
 <script src="{% static 'posts/js/base.js' %}"></script>
 </body>
 </html>

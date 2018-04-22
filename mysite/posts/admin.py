@@ -9,10 +9,10 @@ class UserAdmin(admin.ModelAdmin):
 		('账号信息', {'fields': ['account', 'password', 'token'], 'classes':['collapse']}),
 		('用户资料', {'fields': ['nickName', 'sex', 'headPortrait']}),
 	]
-	list_display = ('nickName', 'sex')
+	list_display = ('account', 'nickName', 'sex', 'createDate')
 	list_filter = ['sex']
 	search_fields = ['account', 'nickName']
-	readonly_fields = ['account', 'token']
+	readonly_fields = ['account', 'nickName', 'token']
 
 
 class PostAdmin(admin.ModelAdmin):

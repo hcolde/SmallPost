@@ -19,9 +19,10 @@ class User(models.Model):
 	account = models.CharField(verbose_name='账号', max_length=11)
 	password = models.CharField(verbose_name='密码', max_length=18)
 	nickName = models.CharField(verbose_name='昵称', max_length=8)
-	token = models.CharField(max_length=32, blank=True)
-	headPortrait = models.ImageField(verbose_name='头像', upload_to='uploads/', blank=True)
+	token = models.CharField(max_length=32, null=True)
+	headPortrait = models.ImageField(verbose_name='头像', upload_to='uploads/', default='uploads/default.jpg')
 	sex = models.CharField(verbose_name='性别', max_length=2, choices=GENDER_CHOICE)
+	createDate = models.DateTimeField(verbose_name='注册时间', auto_now_add=True)
 
 
 	class Meta:
