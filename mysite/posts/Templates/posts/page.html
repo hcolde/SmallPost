@@ -1,0 +1,18 @@
+{% for contact in contacts %}
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<span><img src="{{ contact.user.headPortrait.url }}"></span>
+		<span name="User">{{ contact.user }}</span>
+		<span style="float: right;">#{{ forloop.counter0|add:start }}</span>
+	</div>
+	<div class="panel-body" onclick="window.open('{% url "posts:detail" contact.id %}');">
+		<label id="Title" title="{{ contact.title }}">
+		{{ contact.title|title|slice:'20' }}
+		{% if contact.title|length > 20 %}
+		...
+		{% endif %}
+		</label>
+	</div>
+</div>
+{% endfor %}
+<div align="center" name="Load">加载更多</div>

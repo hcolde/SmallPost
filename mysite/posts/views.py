@@ -2,38 +2,93 @@
 
 import random
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, Http404
-#from django.contrib import messages
-from django.conf import settings
-from .models import User
+from django.http import Http404
+from django.views import generic
+from django.urls import reverse
+from django.core.paginator import Paginator
+from .models import User, Post
 
 def IndexView(request):
 	'''
-	messages.debug(request, '%s SQL statements were executed.' % count)
-	messages.info(request, 'Three credits remain in your account.')
-	messages.success(request, 'Profile details updated.')
-	messages.warning(request, 'Your account expires in three days.')
-	messages.error(request, 'Document deleted.')
+	首页视图.
+	1. 展示帖子.
+	2. 登录或注册时将表单POST到当前页面.
 	'''
-	if request.POST:
-		belong = request.POST['belong']
-		if belong == 'Login':
-			data = Login(account=request.POST['account'], password=request.POST['password1'])
-			response = redirect('posts:index')
-			response = SetCookies(response, data)
+
+	nickName = request.COOKIES.get('nickName', None)
+	if nickName:
+		response = Posts(nickName, request.POST.get('PostTitle', None), request.POST.get('PostText', None))
+		if response:
 			return response
-		elif belong == 'Register':
-			data = Register(account=request.POST['account'], 
-						password=request.POST['password1'],
-						nickName=request.POST['nickName'],
-						sex=request.POST['sex'],
-						headPortrait=request.FILES.get('headPortrait'))
-			response = redirect('posts:index')
-			response = SetCookies(response, data)
+		else:
+			return 
+	elif request.POST:
+		response = LoginOrRegirest(
+					request.POST.get('belong', None),
+					account=request.POST.get('account', None),
+					password=request.POST.get('password1', None),
+					nickName=request.POST.get('nickName', None),
+					sex=request.POST.get('sex', None),
+					headPortrait=request.FILES.get('headPortrait', None))
+		if response:
 			return response
 		else:
 			raise Http404('阿欧，迷路了！')
-	return render(request, 'posts/index.html', {'msg': '000'})
+	info = Paging(1)
+	return render(request, 'posts/index.html', info)
+
+def PageView(request, page):
+	'''
+	分页视图.
+	'''
+
+	info = Paging(page)
+	return render(request, 'posts/page.html', info)
+
+
+class Detail(generic.DetailView):
+	'''
+	帖子详情视图.
+	'''
+
+	model = Post
+	template_name = 'posts/detail.html'
+
+def Paging(page):
+	'''
+	Django分页方法.
+	按编辑时间排序(从近到远)，每页显示5条数据.
+	'''
+
+	show = 5
+	posts = Post.objects.order_by('-editDate').all()
+	paginator = Paginator(posts, show)
+	contacts = paginator.get_page(page)
+	info = {
+		'contacts': contacts,
+		'start': (page-1)*show+1,
+	}
+	return info
+
+def LoginOrRegirest(which, **kw):
+	'''
+	区分登录或注册操作.
+	'''
+
+	data = None
+	if which == 'Login':
+		data = Login(account=kw['account'], password=kw['password'])
+	elif which == 'Register':
+		data = Register(account=kw['account'], 
+						password=kw['password'],
+						nickName=kw['nickName'],
+						sex=kw['sex'],
+						headPortrait=kw['headPortrait'])
+	else:
+		return None
+	response = redirect('posts:index')
+	response = SetCookies(response, data)
+	return response
 
 def Login(**kw):
 	'''
@@ -155,3 +210,24 @@ def token():
 		z = int((x+95) + (x*(-39)) + (x*(x-1)*35.5) + (x*(x-1)*(x-2)*(-12)))
 		ret += chr(random.randint(y, z))
 	return ret
+
+def Posts(nickName, title, text):
+	'''
+	发帖.
+	1. msg: 
+	'''
+
+	try:
+		user = User.objects.get(nickName=nickName)
+	except:
+		response = redirect('posts:index')
+		response = SetCookies(response, {'msg':''})
+		return 
+	else:
+		post = Post.objects.create()
+		post.title = title
+		post.text = text if text else None
+		post.user = user
+		post.save()
+		response = redirect(reverse('posts:detail', args=(post.id)))
+		return response

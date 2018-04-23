@@ -6,6 +6,6 @@ from . import views
 app_name = 'posts'
 urlpatterns = [
 	path('', views.IndexView, name='index'),
-	#path('Post/<int:page>', views.PostView, name=post),
-	#path('Detail/<int:pk>', views.Detail, name=detail),
+	path('p/<int:page>/', views.PageView, name='page'),
+	path('d/<int:pk>/', views.Detail.as_view(), name='detail'),
 ]

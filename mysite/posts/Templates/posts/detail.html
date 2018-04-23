@@ -1,0 +1,19 @@
+{% extends 'posts/index.html' %}
+{% block title %}{{ post.title }}{% endblock %}
+{% block body %}
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<span><img src="{{ post.user.headPortrait.url }}"></span>
+		<span>{{ post.user }}</span>
+	</div>
+	<div class="panel-body" align="center">
+		<label>{{ post.title|title }}</label>
+	</div>
+	<ul class="list-group">
+		{% if post.text %}
+		<li class="list-group-item">{{ post.text }}</li>
+		{% endif %}
+		<li style="text-align: right;" class="list-group-item">By:{{ post.editDate|date:"Y/m/d H:i:s" }}</li>
+	</ul>
+</div>
+{% endblock %}

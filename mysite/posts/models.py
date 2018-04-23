@@ -27,7 +27,7 @@ class User(models.Model):
 
 	class Meta:
 		verbose_name = '用户'
-		verbose_name_plural = '一群用户'
+		verbose_name_plural = '用户'
 
 	def __str__(self):
 		return self.nickName
@@ -53,7 +53,7 @@ class Post(models.Model):
 
 	class Meta:
 		verbose_name = '帖子'
-		verbose_name_plural = '贴吧'
+		verbose_name_plural = '帖子'
 
 	def __str__(self):
 		return self.title
@@ -79,7 +79,7 @@ class Comment(models.Model):
 
 	class Meta:
 		verbose_name = '评论'
-		verbose_name_plural = '集体吐槽'
+		verbose_name_plural = '评论'
 
 	def __str__(self):
 		return self.text[:10]
