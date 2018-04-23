@@ -22,8 +22,13 @@
 ***
 
 相关配置/框架：
-* 后端：python3.6 django2.0 pipenv<br>
-* 前端：bootstrap3 jquery2.1
+* 后端：
+    1. python3.6 
+    2. django2.0 
+    3. pipenv<br>
+* 前端：
+    1. bootstrap3 
+    2. jquery2.1
 
 ***
 
