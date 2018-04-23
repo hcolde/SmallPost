@@ -22,6 +22,9 @@ window.onload = function(){
 			case "110":
 				alert("注册成功");
 				break;
+			case "000":
+				alert("发帖失败，请检查该账号是否可用");
+				break;
 		}
 		deleteCookie('msg');
 	}

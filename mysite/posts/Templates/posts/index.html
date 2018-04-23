@@ -62,7 +62,7 @@
 {% block js%}
 <script>
 $("div[name='Load']").click(function(){
-	var count = {{ contacts.paginator.num_pages }}
+	var count = {{ contacts.paginator.num_pages }};
 	var page = $("input[name='Page']").val();
 	var next = Number(page) + 1;
 	if (count >= page){

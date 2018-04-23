@@ -2,7 +2,7 @@
 
 import random
 from django.shortcuts import render, redirect
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.views import generic
 from django.urls import reverse
 from django.core.paginator import Paginator
@@ -16,24 +16,23 @@ def IndexView(request):
 	'''
 
 	nickName = request.COOKIES.get('nickName', None)
-	if nickName:
-		response = Posts(nickName, request.POST.get('PostTitle', None), request.POST.get('PostText', None))
-		if response:
+	msg = request.COOKIES.get('msg', None)
+	if request.POST:
+		if nickName and msg=='100':
+			response = Posts(nickName, request.POST.get('PostTitle', None), request.POST.get('PostText', None))
 			return response
 		else:
-			return 
-	elif request.POST:
-		response = LoginOrRegirest(
-					request.POST.get('belong', None),
-					account=request.POST.get('account', None),
-					password=request.POST.get('password1', None),
-					nickName=request.POST.get('nickName', None),
-					sex=request.POST.get('sex', None),
-					headPortrait=request.FILES.get('headPortrait', None))
-		if response:
-			return response
-		else:
-			raise Http404('阿欧，迷路了！')
+			response = LoginOrRegirest(
+						request.POST.get('belong', None),
+						account=request.POST.get('account', None),
+						password=request.POST.get('password1', None),
+						nickName=request.POST.get('nickName', None),
+						sex=request.POST.get('sex', None),
+						headPortrait=request.FILES.get('headPortrait', None))
+			if response:
+				return response
+			else:
+				raise Http404('阿欧，迷路了！')
 	info = Paging(1)
 	return render(request, 'posts/index.html', info)
 
@@ -214,20 +213,21 @@ def token():
 def Posts(nickName, title, text):
 	'''
 	发帖.
-	1. msg: 
+	1. msg: 000 发帖失败.
+	2. 发帖成功则跳转至帖子详情页面.
 	'''
 
 	try:
 		user = User.objects.get(nickName=nickName)
 	except:
 		response = redirect('posts:index')
-		response = SetCookies(response, {'msg':''})
-		return 
+		response.set_cookie('msg', '000')
+		return response
 	else:
 		post = Post.objects.create()
 		post.title = title
 		post.text = text if text else None
 		post.user = user
 		post.save()
-		response = redirect(reverse('posts:detail', args=(post.id)))
+		response = redirect(reverse('posts:detail', args=(post.id,)))
 		return response
