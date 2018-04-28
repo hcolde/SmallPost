@@ -1,0 +1,92 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="{% static 'posts/css/mine.css' %}">
+	<title>{{ nickName }}的个人主页</title>
+</head>
+<body>
+<ul id="myTab" class="nav nav-tabs">
+	<li class="active">
+		<a href="#Data" data-toggle="tab">个人资料</a>
+	</li>
+	<li><a href="#Post" data-toggle="tab">帖子</a></li>
+	<li><a href="#Comment" data-toggle="tab">评论</a></li>
+</ul>
+<div id="myTabContent" class="tab-content" align="center">
+	<div class="tab-pane fade in active" id="Data">
+	<dl>
+		<img style="width: 64px;height: 64px;" src="/media/{{ headPortrait }}">
+		<dt>昵称</dt>
+		<dd>{{ nickName }}</dd>
+		<dt>性别</dt>
+		<dd>{{ sex }}</dd>
+	</dl>
+	</div>
+	<div class="tab-pane fade" id="Post">
+		<span class="glyphicon glyphicon-chevron-left" id="Pleft"></span>
+		<span class="glyphicon glyphicon-chevron-right" id="Pright"></span>
+	</div>
+	<div class="tab-pane fade" id="Comment">
+		<span class="glyphicon glyphicon-chevron-left" id="Cleft"></span>
+		<span class="glyphicon glyphicon-chevron-right" id="Cright"></span>
+	</div>
+</div>
+<script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="{% static 'posts/js/mine.js' %}"></script>
+<script type="text/javascript">
+$("a[href='#Post']").click(function(){
+	$.ajax({url:"{% url 'posts:myData' types=1 %}",success:function(result){
+		FillIn(result);
+		var previous = result.previous;
+		var next = result.next;
+		var left = $("#Pleft");
+		var right = $("#Pright");
+		Turn(left, previous);
+		Turn(right, next);
+	}});
+});
+
+$("a[href='#Comment']").click(function(){
+	$.ajax({url:"{% url 'posts:myData' types=2 %}",success:function(result){
+		FillIn(result);
+		var previous = result.previous;
+		var next = result.next;
+		var left = $("#Cleft");
+		var right = $("#Cright");
+		Turn(left, previous);
+		Turn(right, next);
+	}});
+});
+
+$("#Pright").click(function(){
+	page = $(this).val();
+	$.post("{% url 'posts:myData' types=1 %}",{csrfmiddlewaretoken:'{{ csrf_token }}',page:page},function(result){
+		FillIn(result);
+		var previous = result.previous;
+		var next = result.next;
+		var left = $("#Pleft");
+		var right = $("#Pright");
+		Turn(left, previous);
+		Turn(right, next);
+	});
+});
+
+$("#Pleft").click(function(){
+	page = $(this).val();
+	$.post("{% url 'posts:myData' types=1 %}",{csrfmiddlewaretoken:'{{ csrf_token }}',page:page},function(result){
+		FillIn(result);
+		var previous = result.previous;
+		var next = result.next;
+		var left = $("#Pleft");
+		var right = $("#Pright");
+		Turn(left, previous);
+		Turn(right, next);
+	});
+});
+</script>
+</body>
+</html>

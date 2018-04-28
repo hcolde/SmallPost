@@ -1,0 +1,15 @@
+body{min-width: 1200px;}
+.panel{width: 720px;}
+.glyphicon{
+	font-size: 100px;
+	position: relative;
+	top: 300px;
+}
+.glyphicon-chevron-left{
+	float: left;
+	margin-left: 150px;
+}
+.glyphicon-chevron-right{
+	float: right;
+	margin-right: 150px;
+}

@@ -5,8 +5,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 
 GENDER_CHOICE = [
-	('M', '男'),
-	('F', '女'),
+	('男', '男'),
+	('女', '女'),
 ]
 
 

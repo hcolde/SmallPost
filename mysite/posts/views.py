@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
+import datetime
 import random
 from django.shortcuts import render, redirect
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.views import generic
 from django.urls import reverse
 from django.core.paginator import Paginator
-from .models import User, Post
+from .models import User, Post, Comment
 
 def IndexView(request):
 	'''
@@ -56,7 +57,7 @@ class Detail(generic.DetailView):
 def Paging(page):
 	'''
 	Django分页方法.
-	按编辑时间排序(从近到远)，每页显示5条数据.
+	按编辑时间排序(倒序)，每页显示5条数据.
 	'''
 
 	show = 5
@@ -231,3 +232,69 @@ def Posts(nickName, title, text):
 		post.save()
 		response = redirect(reverse('posts:detail', args=(post.id,)))
 		return response
+
+def MineView(request):
+	'''
+	个人详情.
+	按时间(倒序)排列出个人动态(发帖&评论).
+	用户可在该页面编辑自己的帖子、删除帖子/评论.
+	'''
+
+	nickName = request.COOKIES.get('nickName', '(null)')
+	headPortrait = request.COOKIES.get('headPortrait', None)
+	sex = request.COOKIES.get('sex', '(null)')
+	info = {
+		'nickName': nickName,
+		'headPortrait': headPortrait,
+		'sex': sex,
+	}
+	return render(request, 'posts/mine.html', info)
+
+def MyData(request, types):
+	'''
+	个人详情(帖子、评论)分页.
+	1. types:1 帖子
+	   types:2 评论.
+	2. POST得到页码，如果没有则页码为1.
+	3. 如果有上一页，则返回上一页的页码，若没有则返回0；下一页同上.
+	4. 返回JSON示例 {"previous": 0, "next": 2, "title": ["xxx"], "id": [1]}.
+	'''
+
+	cla = None
+	user = None
+	show = 5
+	page = request.POST.get('page', 1)
+	nickName = request.COOKIES.get('nickName', None)
+	try:
+		user = User.objects.get(nickName=nickName)
+	except:
+		raise Http404('阿欧，迷路了！')
+	if types == 1:
+		cla = Post.objects.filter(user=user).order_by('-editDate')
+	elif types == 2:
+		cla = Comment.objects.filter(user=user).order_by('-publishDate')
+	else:
+		raise Http404('阿欧，迷路了！')
+	paginator = Paginator(cla, show)
+	contacts = paginator.get_page(page)
+	ret = {}
+	ret['previous'] = contacts.previous_page_number() if contacts.has_previous() else 0
+	ret['next'] = contacts.next_page_number() if contacts.has_next() else 0
+	title = []
+	pk = []
+	date = []
+	for item in contacts.object_list:
+		try:
+			title.append(item.title)
+		except:
+			title.append(item.text)
+		pk.append(item.id)
+		try:
+			time = item.editDate
+		except:
+			time = item.publishDate
+		date.append(time.strftime('%Y/%m/%d %H:%M:%S'))
+	ret['title'] = title
+	ret['id'] = pk
+	ret['date'] = date
+	return JsonResponse(ret)

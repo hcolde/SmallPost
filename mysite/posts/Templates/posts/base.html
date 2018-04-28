@@ -96,6 +96,11 @@
 <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
 <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script src="{% static 'posts/js/base.js' %}"></script>
+<script type="text/javascript">
+$("#Welcome").click(function(){
+	window.open("{% url 'posts:mine' %}");
+});
+</script>
 {% block js %}{% endblock %}
 </body>
 </html>
