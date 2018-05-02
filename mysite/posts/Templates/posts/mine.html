@@ -119,6 +119,21 @@ $("#Cleft").click(function(){
 		Turn(right, next);
 	});
 });
+
+function Remove(types, pk){
+	var msg = "请确认是否删除";
+	if(confirm(msg)){
+		$.post("{% url 'posts:remove' %}",{csrfmiddlewaretoken:'{{ csrf_token }}',types:types, pk:pk},function(result){
+			var data = result.info;
+			if(data==1){
+				alert('删除成功');
+				location.reload();
+			}else{
+				alert('无法删除');
+			}
+		});
+	}
+}
 </script>
 </body>
 </html>

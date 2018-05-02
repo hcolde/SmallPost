@@ -257,7 +257,7 @@ def MyData(request, types):
 	   types:2 评论.
 	2. POST得到页码，如果没有则页码为1.
 	3. 如果有上一页，则返回上一页的页码，若没有则返回0；下一页同上.
-	4. 返回JSON示例 {"previous": 0, "next": 2, "title": ["xxx"], "id": [1]}.
+	4. 返回JSON示例 {"types":x, "previous": 0, "next": 2, "title": ["xxx"], "id": [1]}.
 	'''
 
 	cla = None
@@ -278,6 +278,7 @@ def MyData(request, types):
 	paginator = Paginator(cla, show)
 	contacts = paginator.get_page(page)
 	ret = {}
+	ret['types'] = str(types)
 	ret['previous'] = contacts.previous_page_number() if contacts.has_previous() else 0
 	ret['next'] = contacts.next_page_number() if contacts.has_next() else 0
 	title = []
@@ -298,3 +299,26 @@ def MyData(request, types):
 	ret['id'] = pk
 	ret['date'] = date
 	return JsonResponse(ret)
+
+def Remove(request):
+	types = request.POST.get('types', None)
+	pk = int(request.POST.get('pk', None))
+	cla = None
+	info = {}
+	if types and pk:
+		if types == '1':
+			cla = Post.objects.filter(pk=pk)
+		elif types == '2':
+			cla = Comment.objects.filter(pk=pk)
+		else:
+			raise Http404('阿欧，迷路了！')
+		try:
+			cla.delete()
+		except:
+			info['info'] = 0
+		else:
+			info['info'] = 1
+		finally:
+			return JsonResponse(info)
+	else:
+		raise Http404('阿欧，迷路了！')
