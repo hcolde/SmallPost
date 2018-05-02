@@ -9,11 +9,18 @@ function FillIn(data, btn){
 		var title = data.title[i];
 		var id = data.id[i];
 		var date = data.date[i];
-		var html = '<div class="panel panel-default"><div class="panel-heading" align="left">'+ date +'</div><div id="Operat"><span class="glyphicon glyphicon-edit" id="Edit" name="'+ id +'" value="'+ types +'"></span><span class="glyphicon glyphicon-remove" onclick="Remove('+ types +', '+ id +');"></span></div><div class="panel-body">'+ title +'</div></div>';
-		if(btn=="POST")
+		var edit = '<span class="glyphicon glyphicon-edit" onclick="Edit(' + id + ')"></span>';
+		var remove = '<span class="glyphicon glyphicon-remove" onclick="Remove('+ types +', '+ id +');"></span>';
+		var html_start = '<div class="panel panel-default"><div class="panel-heading" align="left">'+ date +'</div><div id="Operat">';
+		var html_end = '</div><div class="panel-body">'+ title +'</div></div>';
+		if(btn=="POST"){
+			var html = html_start + edit + remove + html_end;
 			$("#Post").append(html);
-		else
+		}
+		else{
+			var html = html_start + remove + html_end;
 			$("#Comment").append(html);
+		}
 	}
 }
 

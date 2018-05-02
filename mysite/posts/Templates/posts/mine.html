@@ -34,6 +34,7 @@
 		<span class="glyphicon glyphicon-chevron-right" id="Cright"></span>
 	</div>
 </div>
+<input name="edit" type="text" value="{% url 'posts:edit' pk=1 %}" hidden>
 <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
 <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="{% static 'posts/js/mine.js' %}"></script>
@@ -133,6 +134,11 @@ function Remove(types, pk){
 			}
 		});
 	}
+}
+
+function Edit(pk){
+	url = $("input[name='edit']").val();
+	window.location = url.replace('1', pk);
 }
 </script>
 </body>

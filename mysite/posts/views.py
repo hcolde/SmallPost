@@ -8,6 +8,7 @@ from django.views import generic
 from django.urls import reverse
 from django.core.paginator import Paginator
 from .models import User, Post, Comment
+from .forms import PostForm
 
 def IndexView(request):
 	'''
@@ -322,3 +323,21 @@ def Remove(request):
 			return JsonResponse(info)
 	else:
 		raise Http404('阿欧，迷路了！')
+
+def Edit(request, pk):
+	post = None
+	try:
+		post = Post.objects.get(pk=pk)
+	except:
+		raise Http404('阿欧，迷路了！')
+	if request.method == 'POST':
+		form = PostForm(request.POST)
+		if form.is_valid():
+			postForm = form.save(commit=False)
+			post.title = postForm.title
+			post.text = postForm.text
+			post.save()
+			return redirect('posts:detail', pk = pk)
+	else:
+		form = PostForm({'title':post.title, 'text':post.text})
+	return render(request, 'posts/edit.html', {'form':form})

@@ -11,4 +11,5 @@ urlpatterns = [
 	path('mine/', views.MineView, name='mine'), #个人主页. 
 	path('mine/<int:types>/', views.MyData, name='myData'), #个人发帖/评论 分页.
 	path('mine/remove/', views.Remove, name='remove'), #删除帖子/评论.
+	path('mine/edit/<int:pk>/', views.Edit, name='edit'), #编辑帖子.
 ]
