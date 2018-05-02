@@ -38,9 +38,10 @@
 <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="{% static 'posts/js/mine.js' %}"></script>
 <script type="text/javascript">
+//点击“帖子”按钮
 $("a[href='#Post']").click(function(){
 	$.ajax({url:"{% url 'posts:myData' types=1 %}",success:function(result){
-		FillIn(result);
+		FillIn(result, "POST");
 		var previous = result.previous;
 		var next = result.next;
 		var left = $("#Pleft");
@@ -50,9 +51,10 @@ $("a[href='#Post']").click(function(){
 	}});
 });
 
+//点击“评论按钮”
 $("a[href='#Comment']").click(function(){
 	$.ajax({url:"{% url 'posts:myData' types=2 %}",success:function(result){
-		FillIn(result);
+		FillIn(result, "Comment");
 		var previous = result.previous;
 		var next = result.next;
 		var left = $("#Cleft");
@@ -62,10 +64,11 @@ $("a[href='#Comment']").click(function(){
 	}});
 });
 
+//“帖子”上一页
 $("#Pright").click(function(){
 	page = $(this).val();
 	$.post("{% url 'posts:myData' types=1 %}",{csrfmiddlewaretoken:'{{ csrf_token }}',page:page},function(result){
-		FillIn(result);
+		FillIn(result, "POST");
 		var previous = result.previous;
 		var next = result.next;
 		var left = $("#Pleft");
@@ -75,14 +78,43 @@ $("#Pright").click(function(){
 	});
 });
 
+//“帖子”下一页
 $("#Pleft").click(function(){
 	page = $(this).val();
 	$.post("{% url 'posts:myData' types=1 %}",{csrfmiddlewaretoken:'{{ csrf_token }}',page:page},function(result){
-		FillIn(result);
+		FillIn(result, "POST");
 		var previous = result.previous;
 		var next = result.next;
 		var left = $("#Pleft");
 		var right = $("#Pright");
+		Turn(left, previous);
+		Turn(right, next);
+	});
+});
+
+//“评论”上一页
+$("#Cright").click(function(){
+	page = $(this).val();
+	$.post("{% url 'posts:myData' types=2 %}",{csrfmiddlewaretoken:'{{ csrf_token }}',page:page},function(result){
+		FillIn(result, "Comment");
+		var previous = result.previous;
+		var next = result.next;
+		var left = $("#Cleft");
+		var right = $("#Cright");
+		Turn(left, previous);
+		Turn(right, next);
+	});
+});
+
+//“评论”下一页
+$("#Cleft").click(function(){
+	page = $(this).val();
+	$.post("{% url 'posts:myData' types=2 %}",{csrfmiddlewaretoken:'{{ csrf_token }}',page:page},function(result){
+		FillIn(result, "Comment");
+		var previous = result.previous;
+		var next = result.next;
+		var left = $("#Cleft");
+		var right = $("#Cright");
 		Turn(left, previous);
 		Turn(right, next);
 	});
