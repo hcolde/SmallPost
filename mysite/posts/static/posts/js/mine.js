@@ -1,7 +1,3 @@
-/*$("a[href='#Post']").bind("click", function() {
-	$(this).unbind('click');
-});*/
-
 function FillIn(data, btn){
 	$("div[class^='panel']").remove();
 	var types = data.types;

@@ -31,7 +31,7 @@ class CommentAdmin(admin.ModelAdmin):
 		('评论详情', {'fields': ['user', 'text']}),
 		('评论相关', {'fields': ['contentType', 'likeNum'], 'classes': ['collapse']}),
 	]
-	list_display = ('text', 'user')
+	list_display = ('text', 'user', 'contentObject')
 	list_filter = ['user']
 	search_fields = ['user', 'text']
 	readonly_fields = ['user' ,'contentType', 'likeNum']

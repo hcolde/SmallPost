@@ -16,7 +16,29 @@
 		<li style="text-align: right;" class="list-group-item">By:{{ post.editDate|date:"Y/m/d H:i:s" }}</li>
 	</ul>
 </div>
+<div class="input-group input-group-lg">
+	<input type="text" class="form-control" name="Reply">
+	<span class="input-group-addon" name="ReplyBtn">回帖</span>
+</div>
 {% endblock %}
 
 {% block js %}
+{% load static %}
+<script type="text/javascript" src="{% static 'posts/js/detail.js' %}"></script>
+<script type="text/javascript">
+$("span[name='ReplyBtn']").click(function(){
+	var text = $("input[name='Reply']").val();
+	patern = /^\s+$/;
+	if(text!="" && text!=undefined && !patern.exec(text)){
+		$.post("{% url 'posts:reply' %}",{csrfmiddlewaretoken:'{{ csrf_token }}',pk:{{ post.id }}, text:text},function(result){
+			var data = result.info;
+			if(data==1){
+				location.reload();
+			}else{
+				alert('请登录！');
+			}
+		});
+	}
+});
+</script>
 {% endblock %}

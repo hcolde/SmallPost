@@ -1,7 +1,7 @@
 //发帖
 $("#PostSubmit").click(function(){
 	title = $("input[name='PostTitle']").val();
-	patern = /^\s+$/
+	patern = /^\s+$/;
 	if (title=="" || title==undefined || patern.exec(title)){
 		alert("请填写必填信息");
 	}else{

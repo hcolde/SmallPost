@@ -341,3 +341,25 @@ def Edit(request, pk):
 	else:
 		form = PostForm({'title':post.title, 'text':post.text})
 	return render(request, 'posts/edit.html', {'form':form})
+
+def Reply(request):
+	pk = request.POST.get('pk', None)
+	text = request.POST.get('text', None)
+	nickName = request.COOKIES.get('nickName', None)
+	info = {}
+	if pk and text and nickName:
+		try:
+			user = User.objects.get(nickName=nickName)
+			post = Post.objects.get(pk=pk)
+		except:
+			info['info'] = 0
+		else:
+			coment = Comment.objects.create(text=text, user=user, contentObject=post)
+			info['info'] = 1
+		finally:
+			return JsonResponse(info)
+	else:
+		raise Http404('阿欧，迷路了！')
+
+def Comment(request):
+	pass
