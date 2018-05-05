@@ -11,11 +11,16 @@
 	</div>
 	<ul class="list-group">
 		{% if post.text %}
-		<li class="list-group-item">{{ post.text }}</li>
+		<li class="list-group-item">
+		<span style="margin-left:60px;">{{ post.text }}</span>
+		</li>
 		{% endif %}
 		<li style="text-align: right;" class="list-group-item">By:{{ post.editDate|date:"Y/m/d H:i:s" }}</li>
 	</ul>
 </div>
+<div id="Comment" align="center"><span id="View">查看评论</span></div>
+<input type="text" name="page" value=1 hidden>
+<input type="text" name="next" value=1 hidden>
 <div class="input-group input-group-lg">
 	<input type="text" class="form-control" name="Reply">
 	<span class="input-group-addon" name="ReplyBtn">回帖</span>
@@ -24,7 +29,6 @@
 
 {% block js %}
 {% load static %}
-<script type="text/javascript" src="{% static 'posts/js/detail.js' %}"></script>
 <script type="text/javascript">
 $("span[name='ReplyBtn']").click(function(){
 	var text = $("input[name='Reply']").val();
@@ -37,6 +41,29 @@ $("span[name='ReplyBtn']").click(function(){
 			}else{
 				alert('请登录！');
 			}
+		});
+	}
+});
+$("#View").click(function(){
+	var page = $("input[name='page']").val();
+	var next = $("input[name='next']").val();
+	if(next!=0){
+		$.post("{% url 'posts:comment' %}",{csrfmiddlewaretoken:'{{ csrf_token }}',pk:{{ post.id }},page:page},function(result){
+				for(var i=0;i<result["text"].length;i++){
+					var text = result["text"][i];
+					var date = result["date"][i];
+					var likeNum = result["likeNum"][i];
+					var user = result["user"][i];
+					var headPortrait = result['headPortrait'][i];
+					var html = '<div class="panel panel-default" align="left"><div class="panel-heading"><span><img src="'+ headPortrait +'"></span><span>'+ user +'&nbsp;&nbsp;'+ date +'</span></div><div class="panel-body"><label style="margin-left:60px;">'+ text +'</label></div></div>';
+					$("#Comment").prepend(html);
+				if(result['next']){
+					$("input[name='page']").val(page+1);
+					$("input[name='next']").val(1);
+				}else{
+					$("#View").text("没有更多");
+					$("input[name='next']").val(0);
+				}}
 		});
 	}
 });

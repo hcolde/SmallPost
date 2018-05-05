@@ -2,7 +2,7 @@
 
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 
 GENDER_CHOICE = [
 	('男', '男'),
@@ -49,6 +49,8 @@ class Post(models.Model):
 	show = models.BooleanField(verbose_name='是否显示', default=True)
 	likeNum = models.IntegerField(verbose_name='点赞数', default=0)
 	readNum = models.IntegerField(verbose_name='阅读人数', default=0)
+	comment = GenericRelation('Comment', content_type_field='contentType', object_id_field='objectId')
+
 
 
 	class Meta:

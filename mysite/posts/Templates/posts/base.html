@@ -30,7 +30,7 @@
 				<h4 class="modal-title" id="myModalLabel"></h4>
 			</div>
 			<div class="modal-body" id="myModalBody">
-				<form method="POST" class="form-horizontal" role="form" enctype="multipart/form-data">
+				<form method="POST" class="form-horizontal" role="form" enctype="multipart/form-data" action="{% url 'posts:index' %}">
 				{% csrf_token %}
 				<input type="text" name="belong" hidden>
 				<div class="form-group">

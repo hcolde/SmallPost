@@ -47,7 +47,7 @@ def PageView(request, page):
 	return render(request, 'posts/page.html', info)
 
 
-class Detail(generic.DetailView):
+class DetailView(generic.DetailView):
 	'''
 	帖子详情视图.
 	'''
@@ -219,19 +219,25 @@ def Posts(nickName, title, text):
 	2. 发帖成功则跳转至帖子详情页面.
 	'''
 
+	response = None
 	try:
 		user = User.objects.get(nickName=nickName)
 	except:
 		response = redirect('posts:index')
 		response.set_cookie('msg', '000')
-		return response
 	else:
-		post = Post.objects.create()
-		post.title = title
-		post.text = text if text else None
-		post.user = user
-		post.save()
-		response = redirect(reverse('posts:detail', args=(post.id,)))
+		token = request.COOKIES.get('token', None)
+		if token == user.token:
+			post = Post.objects.create()
+			post.title = title
+			post.text = text if text else None
+			post.user = user
+			post.save()
+			response = redirect(reverse('posts:detail', args=(post.id,)))
+		else:
+			response = redirect('posts:index')
+			response.set_cookie('msg', '000')
+	finally:
 		return response
 
 def MineView(request):
@@ -251,7 +257,7 @@ def MineView(request):
 	}
 	return render(request, 'posts/mine.html', info)
 
-def MyData(request, types):
+def MyDataView(request, types):
 	'''
 	个人详情(帖子、评论)分页.
 	1. types:1 帖子
@@ -301,50 +307,85 @@ def MyData(request, types):
 	ret['date'] = date
 	return JsonResponse(ret)
 
-def Remove(request):
+def RemoveView(request):
+	'''
+	删帖、删除评论.
+	types: 1.删帖 2.删除评论.
+	'''
+
 	types = request.POST.get('types', None)
 	pk = int(request.POST.get('pk', None))
+	token = request.COOKIES.get('token', None)
+	nickName = request.COOKIES.get('nickName', None)
 	cla = None
 	info = {}
-	if types and pk:
-		if types == '1':
-			cla = Post.objects.filter(pk=pk)
-		elif types == '2':
-			cla = Comment.objects.filter(pk=pk)
+	try:
+		user = User.objects.get(nickName=nickName)
+	except:
+		info['info'] = 0
+		return JsonResponse(info)
+	else:
+		if token != user.token:
+			info['info'] = 0
+			return JsonResponse(info)
+		elif types and pk:
+			if types == '1':
+				cla = Post.objects.filter(pk=pk)
+			elif types == '2':
+				cla = Comment.objects.filter(pk=pk)
+			else:
+				raise Http404('阿欧，迷路了！')
+			try:
+				cla.delete()
+			except:
+				info['info'] = 0
+			else:
+				info['info'] = 1
+			finally:
+				return JsonResponse(info)
 		else:
 			raise Http404('阿欧，迷路了！')
-		try:
-			cla.delete()
-		except:
-			info['info'] = 0
-		else:
-			info['info'] = 1
-		finally:
-			return JsonResponse(info)
-	else:
-		raise Http404('阿欧，迷路了！')
 
-def Edit(request, pk):
+def EditView(request, pk):
+	'''
+	编辑帖子.
+	'''
+
+	token = request.COOKIES.get('token', None)
+	nickName = request.COOKIES.get('nickName', None)
 	post = None
 	try:
-		post = Post.objects.get(pk=pk)
+		user = User.objects.get(nickName=nickName)
 	except:
 		raise Http404('阿欧，迷路了！')
-	if request.method == 'POST':
-		form = PostForm(request.POST)
-		if form.is_valid():
-			postForm = form.save(commit=False)
-			post.title = postForm.title
-			post.text = postForm.text
-			post.save()
-			return redirect('posts:detail', pk = pk)
 	else:
-		form = PostForm({'title':post.title, 'text':post.text})
-	return render(request, 'posts/edit.html', {'form':form})
+		if token != user.token:
+			raise Http404('登录信息已过期，请重新登录')
+		else:
+			try:
+				post = Post.objects.get(pk=pk)
+			except:
+				raise Http404('阿欧，迷路了！')
+			if request.method == 'POST':
+				form = PostForm(request.POST)
+				if form.is_valid():
+					postForm = form.save(commit=False)
+					post.title = postForm.title
+					post.text = postForm.text
+					post.save()
+					return redirect('posts:detail', pk = pk)
+			else:
+				form = PostForm({'title':post.title, 'text':post.text})
+			return render(request, 'posts/edit.html', {'form':form})
 
-def Reply(request):
+def ReplyView(request):
+	'''
+	回帖.
+	'''
+
 	pk = request.POST.get('pk', None)
 	text = request.POST.get('text', None)
+	token = request.COOKIES.get('token', None)
 	nickName = request.COOKIES.get('nickName', None)
 	info = {}
 	if pk and text and nickName:
@@ -354,12 +395,51 @@ def Reply(request):
 		except:
 			info['info'] = 0
 		else:
-			coment = Comment.objects.create(text=text, user=user, contentObject=post)
-			info['info'] = 1
+			if user.token == token:
+				coment = Comment.objects.create(text=text, user=user, contentObject=post)
+				info['info'] = 1
+			else:
+				info['info'] = 0
 		finally:
 			return JsonResponse(info)
 	else:
 		raise Http404('阿欧，迷路了！')
 
-def Comment(request):
-	pass
+def CommentView(request):
+	'''
+	查看所有回帖/评论.
+	'''
+
+	pk = request.POST.get('pk', None)
+	page = request.POST.get('page', 1)
+	show = 5
+	text = []
+	date = []
+	likeNum = []
+	user = []
+	headPortrait = []
+	info = {}
+	if pk:
+		try:
+			post = Post.objects.get(pk=pk)
+		except:
+			raise Http404('阿欧，迷路了！')
+		else:
+			comment = post.comment.order_by('-publishDate')
+			paginator = Paginator(comment, show)
+			pageNum = paginator.page(page)
+			for item in pageNum.object_list:
+				text.append(item.text)
+				date.append(item.publishDate.strftime('%Y/%m/%d %H:%M:%S'))
+				likeNum.append(item.likeNum)
+				user.append(item.user.nickName)
+				headPortrait.append(item.user.headPortrait.url)
+			info['text'] = text
+			info['date'] = date
+			info['likeNum'] = likeNum
+			info['user'] = user
+			info['headPortrait'] = headPortrait
+			info['next'] = pageNum.has_next()
+			return JsonResponse(info)
+	else:
+		raise Http404('阿欧，迷路了！')

@@ -17,7 +17,7 @@
 		</div>
 		<div id="collapseOne" class="panel-collapse collapse">
 			<div class="panel-body">
-				<form role="form" method="POST" name="PostForm">
+				<form role="form" method="POST" name="PostForm" action="{% url 'posts:index' %}">
 					{% csrf_token %}
 					<div class="form-group">
 						<label for="name"><span style="color: red;">*</span>标题</label>
