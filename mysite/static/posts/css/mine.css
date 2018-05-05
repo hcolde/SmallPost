@@ -1,0 +1,27 @@
+body{min-width: 1200px;}
+.panel{width: 720px;}
+.glyphicon{
+	font-size: 100px;
+	position: relative;
+	top: 300px;
+}
+.glyphicon-chevron-left{
+	float: left;
+	margin-left: 150px;
+}
+.glyphicon-chevron-right{
+	float: right;
+	margin-right: 150px;
+}
+#Operat{
+	position: relative;
+	top: -330px;
+	left: 330px;
+}
+.glyphicon-remove, .glyphicon-edit{
+	font-size: 25px;
+	margin-right: 15px;
+}
+.glyphicon-edit{
+	color: #5CACEE;
+}
