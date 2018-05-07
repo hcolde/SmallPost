@@ -32,6 +32,7 @@ $("span[name='ReplyBtn']").click(function(){
 	if(text!="" && text!=undefined && !patern.exec(text)){
 		$.post("{% url 'posts:reply' %}",{csrfmiddlewaretoken:'{{ csrf_token }}',pk:{{ post.id }}, text:text},function(result){
 			var data = result.info;
+			alert(data);
 			if(data==1){
 				location.reload();
 			}else{

@@ -336,7 +336,7 @@ def Reply(request):
 		except:
 			info['info'] = 0
 		else:
-			coment = Comment.objects.create(text=text, user=user, contentObject=post)
+			Comment.objects.create(text=text, user=user, contentObject=post)
 			info['info'] = 1
 		finally:
 			return JsonResponse(info)
