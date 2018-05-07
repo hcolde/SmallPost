@@ -149,20 +149,6 @@ def Register(**kw):
 			user.save()
 	return json
 
-def SetCookies(response, data):
-	'''
-	设置cookie.
-	包含msg、昵称、性别、头像、token.
-	当登录失败时，昵称、性别、头像、token的cookie值为空.
-	'''
-	
-	response.set_cookie('msg', data['msg'])
-	response.set_cookie('nickName', data['nickName'])
-	response.set_cookie('sex', data['sex'])
-	response.set_cookie('headPortrait', data['headPortrait'])
-	response.set_cookie('token', data['token'])
-	return response
-
 def RandomPosition():
 	'''
 	按权重随机获取下划线、数字、大小写字母.
