@@ -24,13 +24,7 @@ def IndexView(request):
 			response = Posts(nickName, request.POST.get('PostTitle', None), request.POST.get('PostText', None))
 			return response
 		else:
-			response = LoginOrRegirest(
-						request.POST.get('belong', None),
-						account=request.POST.get('account', None),
-						password=request.POST.get('password1', None),
-						nickName=request.POST.get('nickName', None),
-						sex=request.POST.get('sex', None),
-						headPortrait=request.FILES.get('headPortrait', None))
+			response = LoginOrRegirest(request.POST.get('belong', None), account=request.POST.get('account', None), password=request.POST.get('password1', None), nickName=request.POST.get('nickName', None), sex=request.POST.get('sex', None), headPortrait=request.FILES.get('headPortrait', None))
 			if response:
 				return response
 			else:
@@ -77,18 +71,19 @@ def LoginOrRegirest(which, **kw):
 	'''
 
 	data = None
+	response = redirect('posts:index')
 	if which == 'Login':
 		data = Login(account=kw['account'], password=kw['password'])
+		response.set_cookie('msg', data['msg'])
+		response.set_cookie('nickName', data['nickName'])
+		response.set_cookie('sex', data['sex'])
+		response.set_cookie('headPortrait', data['headPortrait'])
+		response.set_cookie('token', data['token'])
 	elif which == 'Register':
-		data = Register(account=kw['account'], 
-						password=kw['password'],
-						nickName=kw['nickName'],
-						sex=kw['sex'],
-						headPortrait=kw['headPortrait'])
+		data = Register(account=kw['account'], password=kw['password'], nickName=kw['nickName'], sex=kw['sex'], headPortrait=kw['headPortrait'])
+		response.set_cookie('msg', data['msg'])
 	else:
 		return None
-	response = redirect('posts:index')
-	response = SetCookies(response, data)
 	return response
 
 def Login(**kw):
@@ -100,7 +95,7 @@ def Login(**kw):
 	登录成功后将赋予一个新的token值.
 	'''
 
-	json = {'nickName': '', 'sex': '', 'headPortrait': '', 'token':''}
+	json = {}
 	try:
 		user = User.objects.get(account=kw['account'])
 	except:
@@ -127,20 +122,21 @@ def Register(**kw):
 	3. msg:110 注册成功.
 	'''
 
-	json = {'nickName': '', 'sex': '', 'headPortrait': '', 'token':''}
-	isExist = False
+	json = {}
+	accountExist = False
+	nameExist = False
 	try:
-		isExist = User.objects.get(account=kw['account'])
+		accountExist = User.objects.get(account=kw['account'])
 	except:
 		pass
-	if isExist:
+	if accountExist:
 		json['msg'] = '011'
 	else:
 		try:
-			isExist = User.objects.get(nickName=kw['nickName'])
+			nameExist = User.objects.get(nickName=kw['nickName'])
 		except:
 			pass
-		if isExist:
+		if nameExist:
 			json['msg'] = '101'
 		else:
 			json['msg'] = '110'
@@ -152,20 +148,6 @@ def Register(**kw):
 			user.headPortrait = kw['headPortrait'] if kw['headPortrait'] else user.headPortrait
 			user.save()
 	return json
-
-def SetCookies(response, data):
-	'''
-	设置cookie.
-	包含msg、昵称、性别、头像、token.
-	当注册失败或登录失败时，昵称、性别、头像、token的cookie值为空.
-	'''
-
-	response.set_cookie('msg', data['msg'])
-	response.set_cookie('nickName', data['nickName'])
-	response.set_cookie('sex', data['sex'])
-	response.set_cookie('headPortrait', data['headPortrait'])
-	response.set_cookie('token', data['token'])
-	return response
 
 def RandomPosition():
 	'''
@@ -396,7 +378,7 @@ def ReplyView(request):
 			info['info'] = 0
 		else:
 			if user.token == token:
-				coment = Comment.objects.create(text=text, user=user, contentObject=post)
+				Comment.objects.create(text=text, user=user, contentObject=post)
 				info['info'] = 1
 			else:
 				info['info'] = 0
