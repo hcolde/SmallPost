@@ -95,7 +95,7 @@ def Login(**kw):
 	登录成功后将赋予一个新的token值.
 	'''
 
-	json = {}
+	json = {'nickName':None, 'sex':None, 'headPortrait':None, 'token':None}
 	try:
 		user = User.objects.get(account=kw['account'])
 	except:
