@@ -21,7 +21,8 @@ def IndexView(request):
 	msg = request.COOKIES.get('msg', None)
 	if request.POST:
 		if nickName and msg=='100':
-			response = Posts(nickName, request.POST.get('PostTitle', None), request.POST.get('PostText', None))
+			token = request.COOKIES.get('token', None)
+			response = Posts(nickName, request.POST.get('PostTitle', None), request.POST.get('PostText', None), token)
 			return response
 		else:
 			response = LoginOrRegirest(request.POST.get('belong', None), account=request.POST.get('account', None), password=request.POST.get('password1', None), nickName=request.POST.get('nickName', None), sex=request.POST.get('sex', None), headPortrait=request.FILES.get('headPortrait', None))
@@ -194,7 +195,7 @@ def token():
 		ret += chr(random.randint(y, z))
 	return ret
 
-def Posts(nickName, title, text):
+def Posts(nickName, title, text, token):
 	'''
 	发帖.
 	1. msg: 000 发帖失败.
@@ -204,11 +205,11 @@ def Posts(nickName, title, text):
 	response = None
 	try:
 		user = User.objects.get(nickName=nickName)
+		print('读取用户信息')
 	except:
 		response = redirect('posts:index')
 		response.set_cookie('msg', '000')
 	else:
-		token = request.COOKIES.get('token', None)
 		if token == user.token:
 			post = Post.objects.create()
 			post.title = title
